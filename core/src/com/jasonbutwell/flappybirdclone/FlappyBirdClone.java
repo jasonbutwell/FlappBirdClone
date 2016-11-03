@@ -7,10 +7,17 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+import java.util.Random;
+
+import static com.badlogic.gdx.math.MathUtils.random;
+
 public class FlappyBirdClone extends ApplicationAdapter {
 	SpriteBatch batch;
 	Texture background;
 	Texture birds[];
+
+	Texture tubeTop, tubeBottom;
+
 	int flapState = 0;
 
 	float birdY = 0;
@@ -20,6 +27,13 @@ public class FlappyBirdClone extends ApplicationAdapter {
 	float gravity = 2;
 
 	float dt;
+
+	float gap = 400;
+
+	float maxTubeOffset;
+	float tubeOffset;
+
+	Random ranom;
 
 	@Override
 	public void create () {
@@ -31,7 +45,14 @@ public class FlappyBirdClone extends ApplicationAdapter {
 		birds[0] = new Texture("bird.png");
 		birds[1] = new Texture("bird2.png");
 
+		tubeTop = new Texture("toptube.png");
+		tubeBottom = new Texture("bottomtube.png");
+
 		birdY = (Gdx.graphics.getHeight()-birds[0].getHeight())/2;
+
+		maxTubeOffset = Gdx.graphics.getHeight()/2 - gap/2 - 100;
+
+		ranom = new Random();
 	}
 
 	@Override
@@ -43,6 +64,7 @@ public class FlappyBirdClone extends ApplicationAdapter {
 
 			if (Gdx.input.justTouched()) {
 				velocity = -25;
+				tubeOffset = (random.nextFloat() - 0.5f) * (Gdx.graphics.getHeight()- gap - 200);
 			}
 
 			if ( birdY > 0 || velocity < 0) {
@@ -71,6 +93,10 @@ public class FlappyBirdClone extends ApplicationAdapter {
 
 		batch.begin();
 		batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+		batch.draw(tubeTop, (Gdx.graphics.getWidth()-tubeTop.getWidth())/2, (Gdx.graphics.getHeight()/2)+ (gap /2) + tubeOffset);
+		batch.draw(tubeBottom, (Gdx.graphics.getWidth()-tubeBottom.getWidth())/2, Gdx.graphics.getHeight()/2 - gap / 2 - tubeBottom.getHeight() + tubeOffset );
+
 		batch.draw(birds[flapState], (Gdx.graphics.getWidth() - birds[0].getWidth()) / 2, birdY);
 		batch.end();
 	}
