@@ -92,7 +92,8 @@ public class FlappyBirdClone extends ApplicationAdapter {
 		for (int i=0; i < numberOfTubes; i++ ) {
 
 			tubeOffset[i] = (random.nextFloat() - 0.5f) * (Gdx.graphics.getHeight()- gap - 200);
-			tubeX[i] = (Gdx.graphics.getWidth()-tubeTop.getWidth())/2 + (i*distanceBetweenTubes);
+
+			tubeX[i] = (Gdx.graphics.getWidth()-tubeTop.getWidth())/2 + Gdx.graphics.getWidth() + (i*distanceBetweenTubes);
 
 			pipeRectangleUp[i] = new Rectangle();
 			pipeRectangleDown[i] = new Rectangle();
