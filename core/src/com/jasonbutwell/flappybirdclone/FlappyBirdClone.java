@@ -57,6 +57,9 @@ public class FlappyBirdClone extends ApplicationAdapter {
 	int numberOfTubes = 4;
 	float distanceBetweenTubes;
 
+	int pointsScore;
+	int scoreTube;
+
 	Random ranom;
 
 	@Override
@@ -100,6 +103,9 @@ public class FlappyBirdClone extends ApplicationAdapter {
 		}
 
 		birdCircle = new Circle();
+
+		pointsScore = 0;
+		scoreTube = 0;
 	}
 
 	@Override
@@ -111,6 +117,20 @@ public class FlappyBirdClone extends ApplicationAdapter {
 		batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
 		if (gameState != 0) {
+
+			if ( tubeX[scoreTube] < Gdx.graphics.getWidth()/2) {
+
+				pointsScore++;
+
+				Gdx.app.log("score",String.valueOf(pointsScore));
+
+				if ( scoreTube < numberOfTubes ) {
+					scoreTube++;
+					scoreTube = scoreTube % numberOfTubes;
+				}
+			}
+
+
 
 			if (Gdx.input.justTouched()) {
 				velocity = -25;
@@ -131,6 +151,7 @@ public class FlappyBirdClone extends ApplicationAdapter {
 
 				pipeRectangleUp[i] = new Rectangle(tubeX[i],(Gdx.graphics.getHeight()/2) + (gap /2) + tubeOffset[i],tubeTop.getWidth(), tubeTop.getHeight());
 				pipeRectangleDown[i] = new Rectangle(tubeX[i],(Gdx.graphics.getHeight()/2) - gap / 2 - tubeBottom.getHeight() + tubeOffset[i],tubeBottom.getWidth(), tubeBottom.getHeight());
+
 			}
 
 			if ( birdY > 0 || velocity < 0) {
@@ -180,7 +201,7 @@ public class FlappyBirdClone extends ApplicationAdapter {
 
 			if (Intersector.overlaps(birdCircle,pipeRectangleUp[i]) || Intersector.overlaps(birdCircle,pipeRectangleDown[i])) {
 				// bird has collided with either a top or a bottom pipe
-				Gdx.app.log("Collision","Yes");
+				//Gdx.app.log("Collision","Yes");
 			}
 		}
 
