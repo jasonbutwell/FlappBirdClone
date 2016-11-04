@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Rectangle;
 
 import java.util.Random;
 
@@ -19,6 +20,9 @@ public class FlappyBirdClone extends ApplicationAdapter {
 	// Collision detection
 
 	Circle birdCircle;
+
+	Rectangle pipeRectangleUp[];
+	Rectangle pipeRectangleDown[];
 
 	SpriteBatch batch;
 
@@ -79,10 +83,16 @@ public class FlappyBirdClone extends ApplicationAdapter {
 
 		distanceBetweenTubes = ( Gdx.graphics.getWidth() * 3 ) / 4;
 
+		pipeRectangleUp = new Rectangle[numberOfTubes];
+		pipeRectangleDown = new Rectangle[numberOfTubes];
+
 		for (int i=0; i < numberOfTubes; i++ ) {
 
 			tubeOffset[i] = (random.nextFloat() - 0.5f) * (Gdx.graphics.getHeight()- gap - 200);
 			tubeX[i] = (Gdx.graphics.getWidth()-tubeTop.getWidth())/2 + (i*distanceBetweenTubes);
+
+			pipeRectangleUp[i] = new Rectangle();
+			pipeRectangleDown[i] = new Rectangle();
 		}
 
 		//tubeX = (Gdx.graphics.getWidth()-tubeTop.getWidth())/2;
@@ -116,6 +126,9 @@ public class FlappyBirdClone extends ApplicationAdapter {
 
 				batch.draw(tubeTop, tubeX[i], (Gdx.graphics.getHeight()/2)+ (gap /2) + tubeOffset[i]);
 				batch.draw(tubeBottom, tubeX[i], Gdx.graphics.getHeight()/2 - gap / 2 - tubeBottom.getHeight() + tubeOffset[i] );
+
+				pipeRectangleUp[i] = new Rectangle(tubeX[i],(Gdx.graphics.getHeight()/2) + (gap /2) + tubeOffset[i],tubeTop.getWidth(), tubeTop.getHeight());
+				pipeRectangleDown[i] = new Rectangle(tubeX[i],(Gdx.graphics.getHeight()/2) - gap / 2 - tubeBottom.getHeight() + tubeOffset[i],tubeBottom.getWidth(), tubeBottom.getHeight());
 			}
 
 			if ( birdY > 0 || velocity < 0) {
@@ -151,6 +164,12 @@ public class FlappyBirdClone extends ApplicationAdapter {
 		shapeRenderer.setColor(Color.RED);
 
 		shapeRenderer.circle(birdCircle.x,birdCircle.y,birdCircle.radius);
+
+		for (int i = 0; i < numberOfTubes; i++ ) {
+			shapeRenderer.rect(tubeX[i],Gdx.graphics.getHeight()/2+gap/2+tubeOffset[i],tubeTop.getWidth(),tubeTop.getHeight());
+			shapeRenderer.rect(tubeX[i],(Gdx.graphics.getHeight()/2) - gap / 2 - tubeBottom.getHeight() + tubeOffset[i],tubeBottom.getWidth(), tubeBottom.getHeight());
+		}
+
 		shapeRenderer.end();
 
 	}
