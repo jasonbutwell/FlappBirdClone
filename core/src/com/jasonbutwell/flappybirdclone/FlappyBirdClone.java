@@ -32,6 +32,8 @@ public class FlappyBirdClone extends ApplicationAdapter {
 
 	ShapeRenderer shapeRenderer;
 
+	Texture gameOver;
+
 	Texture background;
 	Texture birds[];
 
@@ -88,6 +90,8 @@ public class FlappyBirdClone extends ApplicationAdapter {
 		tubeTop = new Texture("toptube.png");
 		tubeBottom = new Texture("bottomtube.png");
 
+		gameOver = new Texture("gameover.png");
+
 		birdY = (Gdx.graphics.getHeight()-birds[0].getHeight())/2;
 
 		maxTubeOffset = Gdx.graphics.getHeight()/2 - gap/2 - 100;
@@ -123,7 +127,7 @@ public class FlappyBirdClone extends ApplicationAdapter {
 		batch.begin();
 		batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-		if (gameState != 0) {
+		if (gameState == 1) {
 
 			if ( tubeX[scoreTube] < Gdx.graphics.getWidth()/2) {
 
@@ -151,8 +155,8 @@ public class FlappyBirdClone extends ApplicationAdapter {
 					tubeX[i] -= tubeVelocity;
 				}
 
-				batch.draw(tubeTop, tubeX[i], (Gdx.graphics.getHeight()/2)+ (gap /2) + tubeOffset[i]);
-				batch.draw(tubeBottom, tubeX[i], Gdx.graphics.getHeight()/2 - gap / 2 - tubeBottom.getHeight() + tubeOffset[i] );
+//				batch.draw(tubeTop, tubeX[i], (Gdx.graphics.getHeight()/2)+ (gap /2) + tubeOffset[i]);
+//				batch.draw(tubeBottom, tubeX[i], Gdx.graphics.getHeight()/2 - gap / 2 - tubeBottom.getHeight() + tubeOffset[i] );
 
 				pipeRectangleUp[i] = new Rectangle(tubeX[i],(Gdx.graphics.getHeight()/2) + (gap /2) + tubeOffset[i],tubeTop.getWidth(), tubeTop.getHeight());
 				pipeRectangleDown[i] = new Rectangle(tubeX[i],(Gdx.graphics.getHeight()/2) - gap / 2 - tubeBottom.getHeight() + tubeOffset[i],tubeBottom.getWidth(), tubeBottom.getHeight());
@@ -163,19 +167,52 @@ public class FlappyBirdClone extends ApplicationAdapter {
 				velocity += gravity;
 				birdY -= velocity;
 			}
+			else {
+				gameState = 2;
+			}
 			//System.out.println(dt*10);
 
-		} else {
+		} else if ( gameState == 0) {
 
-			if (Gdx.input.justTouched()) {
+			if ( Gdx.input.justTouched() ) {
 				//Gdx.app.log("Touched","Yep!");
 				gameState = 1;
 			}
+
+		} else if (gameState == 2) {
+
+			// Restart the game
+			if (Gdx.input.justTouched()) {
+				// reset the game state
+				pointsScore = 0;
+				gameState = 1;
+				scoreTube = 0;
+				velocity = 0;
+
+				// reset the bird Y position - to centre of screen
+				birdY = (Gdx.graphics.getHeight()-birds[0].getHeight())/2;
+
+				// re-initialise the pipes again
+
+				for (int i=0; i < numberOfTubes; i++ ) {
+
+					tubeOffset[i] = (random.nextFloat() - 0.5f) * (Gdx.graphics.getHeight()- gap - 200);
+
+					tubeX[i] = (Gdx.graphics.getWidth()-tubeTop.getWidth())/2 + Gdx.graphics.getWidth() + (i*distanceBetweenTubes);
+
+					pipeRectangleUp[i] = new Rectangle();
+					pipeRectangleDown[i] = new Rectangle();
+				}
+			}
 		}
+
+		// Falling when bird has hit pipe
+		if ( gameState == 2 && birdY > 0 )
+			birdY -= (gravity*10);
 
 		dt += Gdx.graphics.getDeltaTime();
 
-		if (dt > 0.1) {
+		if (dt > 0.1 && gameState != 2) {
 			dt = 0;
 			if (flapState == 0)
 				flapState = 1;
@@ -183,7 +220,15 @@ public class FlappyBirdClone extends ApplicationAdapter {
 				flapState = 0;
 		}
 
+		for ( int i=0; i< numberOfTubes; i++ ) {
+			batch.draw(tubeTop, tubeX[i], (Gdx.graphics.getHeight() / 2) + (gap / 2) + tubeOffset[i]);
+			batch.draw(tubeBottom, tubeX[i], Gdx.graphics.getHeight() / 2 - gap / 2 - tubeBottom.getHeight() + tubeOffset[i]);
+		}
+
 		batch.draw(birds[flapState], (Gdx.graphics.getWidth() - birds[0].getWidth()) / 2, birdY);
+		
+		if ( gameState == 2)
+			batch.draw(gameOver, Gdx.graphics.getWidth()/2-gameOver.getWidth()/2, Gdx.graphics.getHeight()/2-gameOver.getHeight()/2);
 
 		font.draw(batch,String.valueOf(pointsScore),16+16/2,Gdx.graphics.getHeight()-16);
 
@@ -210,6 +255,7 @@ public class FlappyBirdClone extends ApplicationAdapter {
 			if (Intersector.overlaps(birdCircle,pipeRectangleUp[i]) || Intersector.overlaps(birdCircle,pipeRectangleDown[i])) {
 				// bird has collided with either a top or a bottom pipe
 				//Gdx.app.log("Collision","Yes");
+				gameState = 2; // game over game state
 			}
 		}
 
