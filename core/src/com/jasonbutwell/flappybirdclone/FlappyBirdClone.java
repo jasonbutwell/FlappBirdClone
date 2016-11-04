@@ -31,15 +31,25 @@ public class FlappyBirdClone extends ApplicationAdapter {
 	float gap = 400;
 
 	float maxTubeOffset;
-	float tubeOffset;
+	float tubeOffset[];
+
+	float tubeVelocity = 4;
+	float tubeX[];
+
+	int numberOfTubes = 4;
+	float distanceBetweenTubes;
 
 	Random ranom;
 
 	@Override
 	public void create () {
 		Gdx.app.setLogLevel(Application.LOG_DEBUG);
+
 		batch = new SpriteBatch();
 		background = new Texture("bg.png");
+
+		tubeX = new float[numberOfTubes];
+		tubeOffset = new float[numberOfTubes];
 
 		birds = new Texture[2];
 		birds[0] = new Texture("bird.png");
@@ -53,6 +63,16 @@ public class FlappyBirdClone extends ApplicationAdapter {
 		maxTubeOffset = Gdx.graphics.getHeight()/2 - gap/2 - 100;
 
 		ranom = new Random();
+
+		distanceBetweenTubes = ( Gdx.graphics.getWidth() * 3 ) / 4;
+
+		for (int i=0; i < numberOfTubes; i++ ) {
+
+			tubeOffset[i] = (random.nextFloat() - 0.5f) * (Gdx.graphics.getHeight()- gap - 200);
+			tubeX[i] = (Gdx.graphics.getWidth()-tubeTop.getWidth())/2 + (i*distanceBetweenTubes);
+		}
+
+		//tubeX = (Gdx.graphics.getWidth()-tubeTop.getWidth())/2;
 	}
 
 	@Override
@@ -60,11 +80,26 @@ public class FlappyBirdClone extends ApplicationAdapter {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+		batch.begin();
+		batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
 		if (gameState != 0) {
 
 			if (Gdx.input.justTouched()) {
 				velocity = -25;
-				tubeOffset = (random.nextFloat() - 0.5f) * (Gdx.graphics.getHeight()- gap - 200);
+			}
+
+			for ( int i=0; i< numberOfTubes; i++ ) {
+
+				if ( tubeX[i] < -tubeTop.getWidth() ) {
+					tubeX[i] += numberOfTubes * distanceBetweenTubes;
+				}
+				else {
+					tubeX[i] -= tubeVelocity;
+				}
+
+				batch.draw(tubeTop, tubeX[i], (Gdx.graphics.getHeight()/2)+ (gap /2) + tubeOffset[i]);
+				batch.draw(tubeBottom, tubeX[i], Gdx.graphics.getHeight()/2 - gap / 2 - tubeBottom.getHeight() + tubeOffset[i] );
 			}
 
 			if ( birdY > 0 || velocity < 0) {
@@ -90,12 +125,6 @@ public class FlappyBirdClone extends ApplicationAdapter {
 			else
 				flapState = 0;
 		}
-
-		batch.begin();
-		batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
-		batch.draw(tubeTop, (Gdx.graphics.getWidth()-tubeTop.getWidth())/2, (Gdx.graphics.getHeight()/2)+ (gap /2) + tubeOffset);
-		batch.draw(tubeBottom, (Gdx.graphics.getWidth()-tubeBottom.getWidth())/2, Gdx.graphics.getHeight()/2 - gap / 2 - tubeBottom.getHeight() + tubeOffset );
 
 		batch.draw(birds[flapState], (Gdx.graphics.getWidth() - birds[0].getWidth()) / 2, birdY);
 		batch.end();
