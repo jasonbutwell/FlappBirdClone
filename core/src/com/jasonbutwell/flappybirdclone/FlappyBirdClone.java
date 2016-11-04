@@ -6,6 +6,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
@@ -62,9 +63,15 @@ public class FlappyBirdClone extends ApplicationAdapter {
 
 	Random ranom;
 
+	BitmapFont font;
+
 	@Override
 	public void create () {
 		Gdx.app.setLogLevel(Application.LOG_DEBUG);
+
+		font = new BitmapFont();
+		font.setColor(Color.WHITE);
+		font.getData().setScale(10);
 
 		shapeRenderer = new ShapeRenderer();
 
@@ -130,8 +137,6 @@ public class FlappyBirdClone extends ApplicationAdapter {
 				}
 			}
 
-
-
 			if (Gdx.input.justTouched()) {
 				velocity = -25;
 			}
@@ -179,6 +184,9 @@ public class FlappyBirdClone extends ApplicationAdapter {
 		}
 
 		batch.draw(birds[flapState], (Gdx.graphics.getWidth() - birds[0].getWidth()) / 2, birdY);
+
+		font.draw(batch,String.valueOf(pointsScore),16+16/2,Gdx.graphics.getHeight()-16);
+
 		batch.end();
 
 		birdCircle.set(Gdx.graphics.getWidth() / 2, birdY + birds[flapState].getHeight() / 2, birds[flapState].getWidth() / 2);
