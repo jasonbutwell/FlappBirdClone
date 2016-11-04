@@ -3,16 +3,27 @@ package com.jasonbutwell.flappybirdclone;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Circle;
 
 import java.util.Random;
 
 import static com.badlogic.gdx.math.MathUtils.random;
 
 public class FlappyBirdClone extends ApplicationAdapter {
+
+	// Collision detection
+
+	Circle birdCircle;
+
 	SpriteBatch batch;
+
+	ShapeRenderer shapeRenderer;
+
 	Texture background;
 	Texture birds[];
 
@@ -45,6 +56,8 @@ public class FlappyBirdClone extends ApplicationAdapter {
 	public void create () {
 		Gdx.app.setLogLevel(Application.LOG_DEBUG);
 
+		shapeRenderer = new ShapeRenderer();
+
 		batch = new SpriteBatch();
 		background = new Texture("bg.png");
 
@@ -73,6 +86,8 @@ public class FlappyBirdClone extends ApplicationAdapter {
 		}
 
 		//tubeX = (Gdx.graphics.getWidth()-tubeTop.getWidth())/2;
+
+		birdCircle = new Circle();
 	}
 
 	@Override
@@ -93,6 +108,7 @@ public class FlappyBirdClone extends ApplicationAdapter {
 
 				if ( tubeX[i] < -tubeTop.getWidth() ) {
 					tubeX[i] += numberOfTubes * distanceBetweenTubes;
+					tubeOffset[i] = (random.nextFloat() - 0.5f) * (Gdx.graphics.getHeight()- gap - 200);
 				}
 				else {
 					tubeX[i] -= tubeVelocity;
@@ -128,5 +144,14 @@ public class FlappyBirdClone extends ApplicationAdapter {
 
 		batch.draw(birds[flapState], (Gdx.graphics.getWidth() - birds[0].getWidth()) / 2, birdY);
 		batch.end();
+
+		birdCircle.set(Gdx.graphics.getWidth()/2,birdY + birds[flapState].getHeight()/2, birds[flapState].getWidth()/2);
+
+		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+		shapeRenderer.setColor(Color.RED);
+
+		shapeRenderer.circle(birdCircle.x,birdCircle.y,birdCircle.radius);
+		shapeRenderer.end();
+
 	}
 }
