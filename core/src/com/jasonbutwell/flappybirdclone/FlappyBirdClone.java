@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 
 import java.util.Random;
@@ -18,6 +19,8 @@ import static com.badlogic.gdx.math.MathUtils.random;
 public class FlappyBirdClone extends ApplicationAdapter {
 
 	// Collision detection
+
+	boolean collisionDebug = false;
 
 	Circle birdCircle;
 
@@ -95,8 +98,6 @@ public class FlappyBirdClone extends ApplicationAdapter {
 			pipeRectangleDown[i] = new Rectangle();
 		}
 
-		//tubeX = (Gdx.graphics.getWidth()-tubeTop.getWidth())/2;
-
 		birdCircle = new Circle();
 	}
 
@@ -158,19 +159,32 @@ public class FlappyBirdClone extends ApplicationAdapter {
 		batch.draw(birds[flapState], (Gdx.graphics.getWidth() - birds[0].getWidth()) / 2, birdY);
 		batch.end();
 
-		birdCircle.set(Gdx.graphics.getWidth()/2,birdY + birds[flapState].getHeight()/2, birds[flapState].getWidth()/2);
+		birdCircle.set(Gdx.graphics.getWidth() / 2, birdY + birds[flapState].getHeight() / 2, birds[flapState].getWidth() / 2);
 
-		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-		shapeRenderer.setColor(Color.RED);
+		if ( collisionDebug ) {
 
-		shapeRenderer.circle(birdCircle.x,birdCircle.y,birdCircle.radius);
-
-		for (int i = 0; i < numberOfTubes; i++ ) {
-			shapeRenderer.rect(tubeX[i],Gdx.graphics.getHeight()/2+gap/2+tubeOffset[i],tubeTop.getWidth(),tubeTop.getHeight());
-			shapeRenderer.rect(tubeX[i],(Gdx.graphics.getHeight()/2) - gap / 2 - tubeBottom.getHeight() + tubeOffset[i],tubeBottom.getWidth(), tubeBottom.getHeight());
+			shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+			shapeRenderer.setColor(Color.RED);
+			shapeRenderer.circle(birdCircle.x, birdCircle.y, birdCircle.radius);
 		}
 
-		shapeRenderer.end();
+		for (int i = 0; i < numberOfTubes; i++ ) {
+
+			if ( collisionDebug ) {
+				shapeRenderer.rect(tubeX[i], Gdx.graphics.getHeight() / 2 + gap / 2 + tubeOffset[i], tubeTop.getWidth(), tubeTop.getHeight());
+				shapeRenderer.rect(tubeX[i], (Gdx.graphics.getHeight() / 2) - gap / 2 - tubeBottom.getHeight() + tubeOffset[i], tubeBottom.getWidth(), tubeBottom.getHeight());
+			}
+
+			// The actual collision detection
+
+			if (Intersector.overlaps(birdCircle,pipeRectangleUp[i]) || Intersector.overlaps(birdCircle,pipeRectangleDown[i])) {
+				// bird has collided with either a top or a bottom pipe
+				Gdx.app.log("Collision","Yes");
+			}
+		}
+
+		if ( collisionDebug )
+			shapeRenderer.end();
 
 	}
 }
